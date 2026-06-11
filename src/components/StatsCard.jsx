@@ -1,5 +1,4 @@
-import React from 'react';
-import { FiTrendingUp, FiAward, FiPieChart } from 'react-icons/fi';
+import { FiTrendingUp, FiPieChart } from 'react-icons/fi';
 
 export const StatsCard = ({ roommates = [] }) => {
   // Calculations
@@ -8,20 +7,8 @@ export const StatsCard = ({ roommates = [] }) => {
   const totalDinner = roommates.reduce((sum, r) => sum + (r.dinner || 0), 0);
   const totalMeals = totalBreakfast + totalLunch + totalDinner;
 
-  // Find roommate with highest total meals (Meal Leader)
-  let leader = null;
-  let maxMeals = -1;
-
-  roommates.forEach((r) => {
-    const userTotal = (r.breakfast || 0) + (r.lunch || 0) + (r.dinner || 0);
-    if (userTotal > maxMeals && userTotal > 0) {
-      maxMeals = userTotal;
-      leader = r.name;
-    }
-  });
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Total Meals Card */}
       <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex items-center space-x-4">
         <div className="p-4 rounded-2xl bg-indigo-50 text-indigo-600">
@@ -82,27 +69,6 @@ export const StatsCard = ({ roommates = [] }) => {
               />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Leader Card */}
-      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex items-center space-x-4">
-        <div className="p-4 rounded-2xl bg-amber-50 text-amber-500">
-          <FiAward className="h-6 w-6" />
-        </div>
-        <div>
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Top Meal Consumer</span>
-          {leader ? (
-            <>
-              <span className="text-xl font-extrabold text-gray-800 block truncate max-w-[170px] sm:max-w-none">{leader}</span>
-              <span className="text-xs text-gray-500 block mt-0.5">{maxMeals} meals consumed</span>
-            </>
-          ) : (
-            <>
-              <span className="text-lg font-bold text-gray-400 block mt-1">No data yet</span>
-              <span className="text-xs text-gray-400 block mt-0.5">Start logging meals</span>
-            </>
-          )}
         </div>
       </div>
     </div>
