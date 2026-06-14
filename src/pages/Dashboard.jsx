@@ -6,6 +6,7 @@ import {
     resetMeal,
     subscribeToRoommates,
     resetAllRoommateMeals,
+    subscribeToUserLogs,
 } from "../services/mealService";
 import MealCard from "../components/MealCard";
 import UserCard from "../components/UserCard";
@@ -20,6 +21,7 @@ export const Dashboard = () => {
     const [roommates, setRoommates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null); // { message: string, type: 'success' | 'error' }
+    const [myLogs, setMyLogs] = useState([]);
 
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,6 +45,16 @@ export const Dashboard = () => {
 
         return () => unsubscribe();
     }, []);
+
+    // Subscribe to current user's logs in real time
+    useEffect(() => {
+        if (!currentUser?.uid) return;
+        const unsubscribeLogs = subscribeToUserLogs(currentUser.uid, (data) => {
+            setMyLogs(data);
+        });
+
+        return () => unsubscribeLogs();
+    }, [currentUser]);
 
     // Find current user's profile record in roommates array
     const myProfile = roommates.find((r) => r.uid === currentUser?.uid) || {
@@ -206,7 +218,7 @@ export const Dashboard = () => {
                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                         Analytics Dashboard
                     </h2>
-                    <StatsCard roommates={roommates} />
+                    <StatsCard roommates={roommates} logs={myLogs} />
                 </section>
 
                 {/* Admin Controls Panel */}

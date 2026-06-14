@@ -19,6 +19,12 @@ service cloud.firestore {
       
       // Deletions are not allowed for roommate records to prevent data loss
       allow delete: if false;
+
+      // Logs subcollection rules
+      match /logs/{logId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      }
     }
   }
 }
