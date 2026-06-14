@@ -5,7 +5,7 @@ service cloud.firestore {
       // Helper function to check if the current user is an admin
       function isAdmin() {
         return request.auth != null && 
-               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true;
       }
 
       // Roommates can view all roommate profiles and meal counts
