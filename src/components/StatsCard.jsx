@@ -25,9 +25,15 @@ export const StatsCard = ({ roommates = [], logs = [] }) => {
             </div>
           ) : (
             logs.map((log) => {
-              const formattedTime = log.timestamp
-                ? new Date(log.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : 'Just now';
+              let formattedTime = 'Just now';
+              if (log.timestamp) {
+                const date = new Date(log.timestamp.seconds * 1000);
+                const today = new Date();
+                const isToday = date.toDateString() === today.toDateString();
+                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                formattedTime = isToday ? timeStr : `${dateStr}, ${timeStr}`;
+              }
               const mealEmoji = log.mealType === 'breakfast' ? '🍳' : log.mealType === 'lunch' ? '🍛' : '🍕';
               return (
                 <div key={log.id} className="flex items-center justify-between text-xs py-2 px-3 bg-slate-50 hover:bg-slate-100/70 border border-slate-100 rounded-2xl transition-colors duration-100">
