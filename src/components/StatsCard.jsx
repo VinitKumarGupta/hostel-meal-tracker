@@ -27,12 +27,20 @@ export const StatsCard = ({ roommates = [], logs = [] }) => {
             logs.map((log) => {
               let formattedTime = 'Just now';
               if (log.timestamp) {
-                const date = new Date(log.timestamp.seconds * 1000);
-                const today = new Date();
-                const isToday = date.toDateString() === today.toDateString();
-                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                formattedTime = isToday ? timeStr : `${dateStr}, ${timeStr}`;
+                let date;
+                if (typeof log.timestamp.toDate === 'function') {
+                  date = log.timestamp.toDate();
+                } else if (log.timestamp.seconds) {
+                  date = new Date(log.timestamp.seconds * 1000);
+                } else {
+                  date = new Date(log.timestamp);
+                }
+                
+                if (date instanceof Date && !isNaN(date)) {
+                  const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  formattedTime = `${dateStr}, ${timeStr}`;
+                }
               }
               const mealEmoji = log.mealType === 'breakfast' ? '🍳' : log.mealType === 'lunch' ? '🍛' : '🍕';
               return (
