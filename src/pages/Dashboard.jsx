@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import {
     incrementMeal,
     decrementMeal,
     resetMeal,
     subscribeToRoommates,
+    resetAllRoommateMeals,
 } from "../services/mealService";
 import MealCard from "../components/MealCard";
 import UserCard from "../components/UserCard";
 import StatsCard from "../components/StatsCard";
 import ConfirmModal from "../components/ConfirmModal";
-import { FiLogOut, FiUser, FiInfo, FiLoader } from "react-icons/fi";
+import { FiLogOut, FiUser, FiInfo, FiLoader, FiRefreshCw } from "react-icons/fi";
 
 export const Dashboard = () => {
     const { currentUser, logout } = useAuth();
@@ -23,6 +24,7 @@ export const Dashboard = () => {
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMealType, setModalMealType] = useState(null);
+    const [isGlobalModalOpen, setIsGlobalModalOpen] = useState(false);
 
     // Helper to trigger toasts
     const triggerToast = (message, type = "success") => {
@@ -91,6 +93,21 @@ export const Dashboard = () => {
         }
     };
 
+    const handleOpenGlobalResetModal = () => {
+        setIsGlobalModalOpen(true);
+    };
+
+    const handleConfirmGlobalReset = async () => {
+        setIsGlobalModalOpen(false);
+        try {
+            await resetAllRoommateMeals(roommates);
+            triggerToast("All Meal Counts Reset", "success");
+        } catch (err) {
+            console.error(err);
+            triggerToast("Global reset failed", "error");
+        }
+    };
+
     // Logout handler
     const handleLogout = async () => {
         try {
@@ -143,6 +160,16 @@ export const Dashboard = () => {
                 onConfirm={handleConfirmReset}
             />
 
+            {/* Global Admin Reset Confirmation Dialog */}
+            <ConfirmModal
+                isOpen={isGlobalModalOpen}
+                isGlobal={true}
+                onClose={() => {
+                    setIsGlobalModalOpen(false);
+                }}
+                onConfirm={handleConfirmGlobalReset}
+            />
+
             {/* Header Bar */}
             <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -182,11 +209,36 @@ export const Dashboard = () => {
                     <StatsCard roommates={roommates} />
                 </section>
 
+                {/* Admin Controls Panel */}
+                {myProfile.isAdmin && (
+                    <section
+                        aria-label="Admin controls"
+                        className="bg-red-50/40 border border-red-100/60 rounded-3xl p-6 shadow-xl shadow-red-50/10 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300"
+                    >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                            <div>
+                                <h3 className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center space-x-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                                    <span>Admin Panel</span>
+                                </h3>
+                                <p className="text-xs text-red-600/80 mt-1 font-medium">
+                                    Perform global actions. Resetting all meal counts will impact all registered roommates.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleOpenGlobalResetModal}
+                                className="flex items-center justify-center space-x-2 px-5 py-3 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold rounded-xl shadow-lg shadow-red-200/50 hover:shadow-red-300/50 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            >
+                                <FiRefreshCw className="h-3.5 w-3.5" />
+                                <span>Reset All Meal Counts</span>
+                            </button>
+                        </div>
+                    </section>
+                )}
+
                 {/* User Counter cards */}
-                <section
-                    aria-label="Personal meal counts"
-                    className="space-y-4"
-                >
+                <section aria-label="Personal meal counts" className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                             Your Meal Counter

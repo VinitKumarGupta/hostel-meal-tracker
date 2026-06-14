@@ -1,7 +1,6 @@
-import React from 'react';
 import { FiAlertTriangle } from 'react-icons/fi';
 
-export const ConfirmModal = ({ isOpen, onClose, onConfirm, mealType }) => {
+export const ConfirmModal = ({ isOpen, onClose, onConfirm, mealType, isGlobal = false }) => {
   if (!isOpen) return null;
 
   // Capitalize meal name
@@ -25,7 +24,15 @@ export const ConfirmModal = ({ isOpen, onClose, onConfirm, mealType }) => {
         </div>
         
         <p className="text-gray-600 mb-6 text-sm sm:text-base leading-relaxed">
-          Are you sure you want to reset your <span className="font-semibold text-gray-900">{capitalizedMeal}</span> count? This action cannot be undone.
+          {isGlobal ? (
+            <>
+              Are you sure you want to <span className="font-semibold text-red-600">reset all meal counts</span> for all roommates? This will set everyone's counts to 0 and cannot be undone.
+            </>
+          ) : (
+            <>
+              Are you sure you want to reset your <span className="font-semibold text-gray-900">{capitalizedMeal}</span> count? This action cannot be undone.
+            </>
+          )}
         </p>
         
         <div className="flex space-x-3 justify-end">

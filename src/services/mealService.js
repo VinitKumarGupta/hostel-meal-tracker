@@ -6,7 +6,8 @@ import {
   onSnapshot, 
   getDoc,
   query,
-  orderBy
+  orderBy,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -88,3 +89,22 @@ export const subscribeToRoommates = (callback) => {
     console.error("Firestore realtime subscription error:", error);
   });
 };
+
+/**
+ * Reset all roommates' meal counts to 0.
+ * @param {Array} roommates - The list of all roommates to reset
+ */
+export const resetAllRoommateMeals = async (roommates) => {
+  if (!Array.isArray(roommates) || roommates.length === 0) return;
+  const batch = writeBatch(db);
+  roommates.forEach((roommate) => {
+    const userDocRef = doc(db, 'users', roommate.uid);
+    batch.update(userDocRef, {
+      breakfast: 0,
+      lunch: 0,
+      dinner: 0
+    });
+  });
+  await batch.commit();
+};
+
