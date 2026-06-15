@@ -141,7 +141,7 @@ export const resetAllRoommateMeals = async (roommates) => {
   
   // Reset counts for all roommates
   roommates.forEach((roommate) => {
-    const userDocRef = doc(db, 'users', roommate.uid);
+    const userDocRef = doc(db, 'users', roommate.id);
     batch.update(userDocRef, {
       breakfast: 0,
       lunch: 0,
@@ -151,7 +151,7 @@ export const resetAllRoommateMeals = async (roommates) => {
   
   // Batch delete logs for all roommates
   for (const roommate of roommates) {
-    const logsCollectionRef = collection(db, 'users', roommate.uid, 'logs');
+    const logsCollectionRef = collection(db, 'users', roommate.id, 'logs');
     const querySnap = await getDocs(logsCollectionRef);
     querySnap.forEach((d) => {
       batch.delete(d.ref);
