@@ -15,7 +15,15 @@ import MealCard from "../components/MealCard";
 import UserCard from "../components/UserCard";
 import StatsCard from "../components/StatsCard";
 import ConfirmModal from "../components/ConfirmModal";
-import { FiLogOut, FiUser, FiInfo, FiLoader, FiRefreshCw, FiVolume2, FiTrash2 } from "react-icons/fi";
+import {
+    FiLogOut,
+    FiUser,
+    FiInfo,
+    FiLoader,
+    FiRefreshCw,
+    FiVolume2,
+    FiTrash2,
+} from "react-icons/fi";
 
 export const Dashboard = () => {
     const { currentUser, logout } = useAuth();
@@ -257,34 +265,45 @@ export const Dashboard = () => {
             {/* Dashboard Main Workspace */}
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-10">
                 {/* Notice Board Section */}
-                <section aria-label="Notice Board" className="space-y-4 animate-in fade-in duration-300">
+                <section
+                    aria-label="Notice Board"
+                    className="space-y-4 animate-in fade-in duration-300"
+                >
                     <div className="flex items-center justify-between">
                         <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center space-x-1.5">
-                            <FiVolume2 className="h-3.5 w-3.5 text-amber-500" />
                             <span>Notice Board</span>
                         </h2>
-                        <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-amber-100">
-                            Real-Time
-                        </span>
                     </div>
-                    
+
                     <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 space-y-4">
                         {notices.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center">
                                 <div className="p-3 rounded-2xl bg-amber-50 text-amber-500 mb-2">
                                     <FiVolume2 className="h-5 w-5" />
                                 </div>
-                                <p className="text-sm text-gray-400 font-medium">No announcements active at the moment.</p>
+                                <p className="text-sm text-gray-400 font-medium">
+                                    No announcements active at the moment.
+                                </p>
                             </div>
                         ) : (
                             <div className="space-y-3.5 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                 {notices.map((notice) => {
-                                    const date = notice.createdAt ? new Date(notice.createdAt.seconds * 1000) : new Date();
-                                    const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                                    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    const date = notice.createdAt
+                                        ? new Date(
+                                              notice.createdAt.seconds * 1000,
+                                          )
+                                        : new Date();
+                                    const dateStr = date.toLocaleDateString(
+                                        [],
+                                        { month: "short", day: "numeric" },
+                                    );
+                                    const timeStr = date.toLocaleTimeString(
+                                        [],
+                                        { hour: "2-digit", minute: "2-digit" },
+                                    );
                                     return (
-                                        <div 
-                                            key={notice.id} 
+                                        <div
+                                            key={notice.id}
                                             className="flex items-start justify-between p-4 bg-amber-50/40 border border-amber-100/30 rounded-2xl hover:bg-amber-50/60 transition-all duration-100"
                                         >
                                             <div className="flex items-start space-x-3.5">
@@ -292,16 +311,23 @@ export const Dashboard = () => {
                                                     <FiVolume2 className="h-4 w-4" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-semibold text-gray-800 whitespace-pre-wrap leading-relaxed">{notice.text}</p>
+                                                    <p className="text-sm font-semibold text-gray-800 whitespace-pre-wrap leading-relaxed">
+                                                        {notice.text}
+                                                    </p>
                                                     <span className="text-[10px] font-bold text-gray-400 mt-1.5 block">
-                                                        Posted on {dateStr} at {timeStr}
+                                                        Posted on {dateStr} at{" "}
+                                                        {timeStr}
                                                     </span>
                                                 </div>
                                             </div>
                                             {myProfile.isAdmin && (
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleDeleteNotice(notice.id)}
+                                                    onClick={() =>
+                                                        handleDeleteNotice(
+                                                            notice.id,
+                                                        )
+                                                    }
                                                     title="Delete Announcement"
                                                     className="p-2 rounded-lg bg-amber-100/50 hover:bg-red-50 text-amber-600 hover:text-red-600 transition-all duration-150 flex-shrink-0"
                                                 >
@@ -336,28 +362,40 @@ export const Dashboard = () => {
                                 <span>Admin Panel</span>
                             </h3>
                             <p className="text-xs text-red-600/80 font-medium">
-                                Manage announcements and perform global system resets.
+                                Manage announcements and perform global system
+                                resets.
                             </p>
                         </div>
 
                         {/* Announcement Creator */}
                         <div className="pt-4 border-t border-red-100/50 space-y-3">
-                            <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Notice Board Announcement</h4>
-                            <form onSubmit={handlePublishNotice} className="flex flex-col sm:flex-row gap-3">
+                            <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Notice Board Announcement
+                            </h4>
+                            <form
+                                onSubmit={handlePublishNotice}
+                                className="flex flex-col sm:flex-row gap-3"
+                            >
                                 <input
                                     type="text"
                                     placeholder="Type announcement notice..."
                                     disabled={noticeLoading}
                                     value={noticeInput}
-                                    onChange={(e) => setNoticeInput(e.target.value)}
+                                    onChange={(e) =>
+                                        setNoticeInput(e.target.value)
+                                    }
                                     className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400 text-sm text-gray-800 disabled:bg-gray-100 disabled:text-gray-400 font-medium transition-all"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={noticeLoading || !noticeInput.trim()}
+                                    disabled={
+                                        noticeLoading || !noticeInput.trim()
+                                    }
                                     className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:bg-gray-300 text-white text-xs font-bold rounded-xl shadow-lg hover:shadow-indigo-200/50 transition-all duration-150 disabled:shadow-none focus:outline-none"
                                 >
-                                    {noticeLoading ? 'Publishing...' : 'Publish Notice'}
+                                    {noticeLoading
+                                        ? "Publishing..."
+                                        : "Publish Notice"}
                                 </button>
                             </form>
                         </div>
@@ -365,9 +403,12 @@ export const Dashboard = () => {
                         {/* Database Controls */}
                         <div className="pt-4 border-t border-red-100/50 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                             <div>
-                                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Reset Database</h4>
+                                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Reset Database
+                                </h4>
                                 <p className="text-[11px] text-gray-400 mt-0.5">
-                                    Resets breakfast, lunch, dinner, and logs for all registered roommates.
+                                    Resets breakfast, lunch, dinner, and logs
+                                    for all registered roommates.
                                 </p>
                             </div>
                             <button
@@ -383,7 +424,10 @@ export const Dashboard = () => {
                 )}
 
                 {/* User Counter cards */}
-                <section aria-label="Personal meal counts" className="space-y-4">
+                <section
+                    aria-label="Personal meal counts"
+                    className="space-y-4"
+                >
                     <div className="flex items-center justify-between">
                         <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                             Your Meal Counter
