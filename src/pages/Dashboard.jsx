@@ -7,12 +7,15 @@ import {
     subscribeToRoommates,
     resetAllRoommateMeals,
     subscribeToUserLogs,
+    subscribeToActiveNotice,
+    setNotice,
+    deleteNotice,
 } from "../services/mealService";
 import MealCard from "../components/MealCard";
 import UserCard from "../components/UserCard";
 import StatsCard from "../components/StatsCard";
 import ConfirmModal from "../components/ConfirmModal";
-import { FiLogOut, FiUser, FiInfo, FiLoader, FiRefreshCw } from "react-icons/fi";
+import { FiLogOut, FiUser, FiInfo, FiLoader, FiRefreshCw, FiVolume2, FiTrash2 } from "react-icons/fi";
 
 export const Dashboard = () => {
     const { currentUser, logout } = useAuth();
@@ -27,6 +30,11 @@ export const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMealType, setModalMealType] = useState(null);
     const [isGlobalModalOpen, setIsGlobalModalOpen] = useState(false);
+
+    // Notice board state
+    const [activeNotice, setActiveNotice] = useState(null);
+    const [noticeInput, setNoticeInput] = useState("");
+    const [noticeLoading, setNoticeLoading] = useState(false);
 
     // Helper to trigger toasts
     const triggerToast = (message, type = "success") => {
@@ -55,6 +63,15 @@ export const Dashboard = () => {
 
         return () => unsubscribeLogs();
     }, [currentUser]);
+
+    // Subscribe to active notice in real time
+    useEffect(() => {
+        const unsubscribe = subscribeToActiveNotice((data) => {
+            setActiveNotice(data);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     // Find current user's profile record in roommates array
     const myProfile = roommates.find((r) => r.uid === currentUser?.uid) || {
@@ -117,6 +134,32 @@ export const Dashboard = () => {
         } catch (err) {
             console.error(err);
             triggerToast("Global reset failed", "error");
+        }
+    };
+
+    const handlePublishNotice = async (e) => {
+        e.preventDefault();
+        if (!noticeInput.trim()) return;
+        setNoticeLoading(true);
+        try {
+            await setNotice(noticeInput);
+            setNoticeInput("");
+            triggerToast("Notice Published Successfully", "success");
+        } catch (err) {
+            console.error(err);
+            triggerToast("Failed to publish notice", "error");
+        } finally {
+            setNoticeLoading(false);
+        }
+    };
+
+    const handleDeleteNotice = async () => {
+        try {
+            await deleteNotice();
+            triggerToast("Notice Deleted Successfully", "success");
+        } catch (err) {
+            console.error(err);
+            triggerToast("Failed to delete notice", "error");
         }
     };
 
@@ -213,6 +256,40 @@ export const Dashboard = () => {
 
             {/* Dashboard Main Workspace */}
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-10">
+                {/* Active Notice Board Banner */}
+                {activeNotice && (
+                    <section
+                        aria-label="Notice Board"
+                        className="bg-amber-50 border border-amber-100/60 rounded-3xl p-5 shadow-xl shadow-amber-100/20 animate-in fade-in slide-in-from-top-4 duration-300"
+                    >
+                        <div className="flex items-start justify-between space-x-3">
+                            <div className="flex items-start space-x-3.5">
+                                <div className="p-3 rounded-2xl bg-amber-100 text-amber-600 flex-shrink-0">
+                                    <FiVolume2 className="h-6 w-6 animate-pulse" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xs font-bold text-amber-700 uppercase tracking-widest">
+                                        Notice Board
+                                    </h3>
+                                    <p className="text-sm font-semibold text-gray-800 mt-1 leading-relaxed whitespace-pre-wrap">
+                                        {activeNotice.text}
+                                    </p>
+                                </div>
+                            </div>
+                            {myProfile.isAdmin && (
+                                <button
+                                    type="button"
+                                    onClick={handleDeleteNotice}
+                                    title="Delete Announcement"
+                                    className="p-2.5 rounded-xl bg-amber-100 hover:bg-red-50 text-amber-600 hover:text-red-600 transition-all duration-150 flex-shrink-0"
+                                >
+                                    <FiTrash2 className="h-4 w-4" />
+                                </button>
+                            )}
+                        </div>
+                    </section>
+                )}
+
                 {/* Top summary cards */}
                 <section aria-label="Overview stats" className="space-y-4">
                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -225,16 +302,46 @@ export const Dashboard = () => {
                 {myProfile.isAdmin && (
                     <section
                         aria-label="Admin controls"
-                        className="bg-red-50/40 border border-red-100/60 rounded-3xl p-6 shadow-xl shadow-red-50/10 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300"
+                        className="bg-red-50/40 border border-red-100/60 rounded-3xl p-6 shadow-xl shadow-red-50/10 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300"
                     >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                        <div>
+                            <h3 className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center space-x-1.5 mb-1.5">
+                                <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                                <span>Admin Panel</span>
+                            </h3>
+                            <p className="text-xs text-red-600/80 font-medium">
+                                Manage announcements and perform global system resets.
+                            </p>
+                        </div>
+
+                        {/* Announcement Creator */}
+                        <div className="pt-4 border-t border-red-100/50 space-y-3">
+                            <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Notice Board Announcement</h4>
+                            <form onSubmit={handlePublishNotice} className="flex flex-col sm:flex-row gap-3">
+                                <input
+                                    type="text"
+                                    placeholder={activeNotice ? "A notice is active. Delete it to post a new one." : "Type announcement notice..."}
+                                    disabled={activeNotice || noticeLoading}
+                                    value={noticeInput}
+                                    onChange={(e) => setNoticeInput(e.target.value)}
+                                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400 text-sm text-gray-800 disabled:bg-gray-100 disabled:text-gray-400 font-medium transition-all"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={activeNotice || noticeLoading || !noticeInput.trim()}
+                                    className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:bg-gray-300 text-white text-xs font-bold rounded-xl shadow-lg hover:shadow-indigo-200/50 transition-all duration-150 disabled:shadow-none focus:outline-none"
+                                >
+                                    {noticeLoading ? 'Publishing...' : 'Publish Notice'}
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Database Controls */}
+                        <div className="pt-4 border-t border-red-100/50 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                             <div>
-                                <h3 className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center space-x-1.5">
-                                    <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-                                    <span>Admin Panel</span>
-                                </h3>
-                                <p className="text-xs text-red-600/80 mt-1 font-medium">
-                                    Perform global actions. Resetting all meal counts will impact all registered roommates.
+                                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Reset Database</h4>
+                                <p className="text-[11px] text-gray-400 mt-0.5">
+                                    Resets breakfast, lunch, dinner, and logs for all registered roommates.
                                 </p>
                             </div>
                             <button

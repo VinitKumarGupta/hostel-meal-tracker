@@ -182,3 +182,41 @@ export const subscribeToUserLogs = (uid, callback) => {
   });
 };
 
+/**
+ * Subscribe to the active notice in real time.
+ * @param {function} callback - Callback function called with notice data
+ * @returns {function} unsubscribe function
+ */
+export const subscribeToActiveNotice = (callback) => {
+  const noticeDocRef = doc(db, 'notices', 'current');
+  return onSnapshot(noticeDocRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback({ id: docSnap.id, ...docSnap.data() });
+    } else {
+      callback(null);
+    }
+  }, (error) => {
+    console.error("Firestore realtime notice subscription error:", error);
+  });
+};
+
+/**
+ * Set the current active notice.
+ * @param {string} text - Notice text
+ */
+export const setNotice = async (text) => {
+  const noticeDocRef = doc(db, 'notices', 'current');
+  await setDoc(noticeDocRef, {
+    text: text.trim(),
+    createdAt: serverTimestamp()
+  });
+};
+
+/**
+ * Delete the active notice.
+ */
+export const deleteNotice = async () => {
+  const noticeDocRef = doc(db, 'notices', 'current');
+  await deleteDoc(noticeDocRef);
+};
+
