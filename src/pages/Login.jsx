@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { FiMail, FiLock, FiUser, FiArrowRight, FiInfo } from 'react-icons/fi';

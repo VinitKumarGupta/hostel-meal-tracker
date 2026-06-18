@@ -17,11 +17,15 @@ service cloud.firestore {
       // Roommates can view all roommate profiles and meal counts
       allow read: if request.auth != null;
       
-      // A roommate can create their own profile document
-      allow create: if request.auth != null && request.auth.uid == userId;
+      // A roommate can create their own profile document (isAdmin must be false or omitted)
+      allow create: if request.auth != null && 
+                       request.auth.uid == userId && 
+                       request.resource.data.get('isAdmin', false) == false;
 
-      // A roommate can update their own profile document
-      allow update: if request.auth != null && request.auth.uid == userId;
+      // A roommate can update their own profile document (cannot change their own isAdmin role)
+      allow update: if request.auth != null && 
+                       request.auth.uid == userId && 
+                       request.resource.data.get('isAdmin', false) == resource.data.get('isAdmin', false);
       
       // An admin can update any user document
       allow update: if isAdmin();

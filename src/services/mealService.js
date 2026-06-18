@@ -12,7 +12,8 @@ import {
   deleteDoc,
   getDocs,
   limit,
-  serverTimestamp
+  serverTimestamp,
+  addDoc
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -183,40 +184,44 @@ export const subscribeToUserLogs = (uid, callback) => {
 };
 
 /**
- * Subscribe to the active notice in real time.
- * @param {function} callback - Callback function called with notice data
+ * Subscribe to all active notices in real time (ordered by creation date desc).
+ * @param {function} callback - Callback function called with list of notices
  * @returns {function} unsubscribe function
  */
-export const subscribeToActiveNotice = (callback) => {
-  const noticeDocRef = doc(db, 'notices', 'current');
-  return onSnapshot(noticeDocRef, (docSnap) => {
-    if (docSnap.exists()) {
-      callback({ id: docSnap.id, ...docSnap.data() });
-    } else {
-      callback(null);
-    }
+export const subscribeToActiveNotices = (callback) => {
+  const noticesCollectionRef = collection(db, 'notices');
+  const q = query(noticesCollectionRef, orderBy('createdAt', 'desc'));
+  
+  return onSnapshot(q, (querySnapshot) => {
+    const notices = [];
+    querySnapshot.forEach((d) => {
+      notices.push({ id: d.id, ...d.data() });
+    });
+    callback(notices);
   }, (error) => {
-    console.error("Firestore realtime notice subscription error:", error);
+    console.error("Firestore realtime notices subscription error:", error);
   });
 };
 
 /**
- * Set the current active notice.
+ * Add a new notice announcement.
  * @param {string} text - Notice text
  */
-export const setNotice = async (text) => {
-  const noticeDocRef = doc(db, 'notices', 'current');
-  await setDoc(noticeDocRef, {
+export const addNotice = async (text) => {
+  const noticesCollectionRef = collection(db, 'notices');
+  await addDoc(noticesCollectionRef, {
     text: text.trim(),
     createdAt: serverTimestamp()
   });
 };
 
 /**
- * Delete the active notice.
+ * Delete a specific notice.
+ * @param {string} noticeId - Notice document ID
  */
-export const deleteNotice = async () => {
-  const noticeDocRef = doc(db, 'notices', 'current');
+export const deleteNotice = async (noticeId) => {
+  if (!noticeId) return;
+  const noticeDocRef = doc(db, 'notices', noticeId);
   await deleteDoc(noticeDocRef);
 };
 

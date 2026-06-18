@@ -1,4 +1,4 @@
-import React from "react";
+
 import { FiSun, FiCoffee, FiMoon } from "react-icons/fi";
 
 export const UserCard = ({ user, isCurrentUser }) => {

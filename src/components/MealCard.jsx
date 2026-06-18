@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { FiSun, FiCoffee, FiMoon, FiPlus, FiMinus, FiRefreshCw } from 'react-icons/fi';
 
 export const MealCard = ({ mealType, count = 0, onIncrement, onDecrement, onReset }) => {
