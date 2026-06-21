@@ -407,8 +407,8 @@ export const Dashboard = () => {
                                     Reset Database
                                 </h4>
                                 <p className="text-[11px] text-gray-400 mt-0.5">
-                                    Resets breakfast, lunch, dinner, and logs
-                                    for all registered roommates.
+                                    Resets breakfast, lunch, and dinner counts
+                                    for all registered roommates. Logs are kept intact.
                                 </p>
                             </div>
                             <button

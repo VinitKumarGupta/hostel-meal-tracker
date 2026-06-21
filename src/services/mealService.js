@@ -133,7 +133,7 @@ export const subscribeToRoommates = (callback) => {
 };
 
 /**
- * Reset all roommates' meal counts to 0.
+ * Reset all roommates' meal counts to 0 (keeps logs intact).
  * @param {Array} roommates - The list of all roommates to reset
  */
 export const resetAllRoommateMeals = async (roommates) => {
@@ -150,15 +150,6 @@ export const resetAllRoommateMeals = async (roommates) => {
     });
   });
   
-  // Batch delete logs for all roommates
-  for (const roommate of roommates) {
-    const logsCollectionRef = collection(db, 'users', roommate.id, 'logs');
-    const querySnap = await getDocs(logsCollectionRef);
-    querySnap.forEach((d) => {
-      batch.delete(d.ref);
-    });
-  }
-  
   await batch.commit();
 };
 
@@ -170,7 +161,7 @@ export const resetAllRoommateMeals = async (roommates) => {
  */
 export const subscribeToUserLogs = (uid, callback) => {
   const logsCollectionRef = collection(db, 'users', uid, 'logs');
-  const q = query(logsCollectionRef, orderBy('timestamp', 'desc'), limit(10));
+  const q = query(logsCollectionRef, orderBy('timestamp', 'desc'), limit(50));
   
   return onSnapshot(q, (querySnapshot) => {
     const logs = [];

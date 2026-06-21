@@ -10,14 +10,14 @@ export const StatsCard = ({ roommates = [], logs = [] }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Recent Activity Logs Card */}
-      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex flex-col justify-between min-h-[200px]">
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex flex-col justify-between min-h-[260px]">
         <div className="flex items-center space-x-3 mb-3">
           <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
             <FiClock className="h-5 w-5" />
           </div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Recent Activity</span>
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Recent Activity (Last 50)</span>
         </div>
-        <div className="flex-1 overflow-y-auto max-h-[120px] pr-1 space-y-2 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto max-h-[180px] pr-1 space-y-2 custom-scrollbar">
           {logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-6 text-center">
               <span className="text-xs text-gray-400 italic">No recent activity logged yet</span>
@@ -58,7 +58,7 @@ export const StatsCard = ({ roommates = [], logs = [] }) => {
       </div>
 
       {/* Distribution Card */}
-      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex flex-col justify-between">
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex flex-col justify-between min-h-[260px]">
         <div className="flex items-center space-x-3 mb-3">
           <div className="p-2.5 rounded-xl bg-teal-50 text-teal-600">
             <FiPieChart className="h-5 w-5" />
