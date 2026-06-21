@@ -1,6 +1,6 @@
 import { FiPieChart, FiClock } from 'react-icons/fi';
 
-export const StatsCard = ({ roommates = [], logs = [] }) => {
+export const StatsCard = ({ roommates = [], logs = [], onResetLogs }) => {
   // Calculations
   const totalBreakfast = roommates.reduce((sum, r) => sum + (r.breakfast || 0), 0);
   const totalLunch = roommates.reduce((sum, r) => sum + (r.lunch || 0), 0);
@@ -11,11 +11,22 @@ export const StatsCard = ({ roommates = [], logs = [] }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Recent Activity Logs Card */}
       <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-100/40 flex flex-col justify-between min-h-[260px]">
-        <div className="flex items-center space-x-3 mb-3">
-          <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
-            <FiClock className="h-5 w-5" />
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+              <FiClock className="h-5 w-5" />
+            </div>
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Recent Activity (Last 50)</span>
           </div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Recent Activity (Last 50)</span>
+          {logs.length > 0 && onResetLogs && (
+            <button
+              type="button"
+              onClick={onResetLogs}
+              className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100/70 px-3 py-1.5 rounded-xl transition-all duration-150"
+            >
+              Clear Logs
+            </button>
+          )}
         </div>
         <div className="flex-1 overflow-y-auto max-h-[180px] pr-1 space-y-2 custom-scrollbar">
           {logs.length === 0 ? (
@@ -38,8 +49,8 @@ export const StatsCard = ({ roommates = [], logs = [] }) => {
                 
                 if (date instanceof Date && !isNaN(date)) {
                   const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  formattedTime = `${dateStr}, ${timeStr}`;
+                  const dayStr = date.toLocaleDateString([], { weekday: 'long' });
+                  formattedTime = `${dateStr}, ${dayStr}`;
                 }
               }
               const mealEmoji = log.mealType === 'breakfast' ? '🍳' : log.mealType === 'lunch' ? '🍛' : '🍕';

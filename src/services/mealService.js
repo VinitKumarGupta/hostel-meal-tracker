@@ -216,3 +216,18 @@ export const deleteNotice = async (noticeId) => {
   await deleteDoc(noticeDocRef);
 };
 
+/**
+ * Delete all activity logs for a specific roommate.
+ * @param {string} uid - User ID
+ */
+export const clearAllUserLogs = async (uid) => {
+  if (!uid) return;
+  const logsCollectionRef = collection(db, 'users', uid, 'logs');
+  const querySnap = await getDocs(logsCollectionRef);
+  const batch = writeBatch(db);
+  querySnap.forEach((d) => {
+    batch.delete(d.ref);
+  });
+  await batch.commit();
+};
+

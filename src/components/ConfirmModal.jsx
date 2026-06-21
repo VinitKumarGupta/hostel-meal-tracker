@@ -42,7 +42,7 @@ export const ConfirmModal = ({
                         <FiAlertTriangle className="h-6 w-6" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-950">
-                        Confirm Reset
+                        {mealType === 'logs' ? 'Clear Activity Logs' : 'Confirm Reset'}
                     </h3>
                 </div>
 
@@ -55,6 +55,13 @@ export const ConfirmModal = ({
                             </span>{" "}
                             for all roommates? This will set everyone's counts
                             to 0. This action cannot be undone.
+                        </>
+                    ) : mealType === 'logs' ? (
+                        <>
+                            Are you sure you want to{" "}
+                            <span className="font-semibold text-red-600">
+                                clear all your activity logs
+                            </span>? This action cannot be undone.
                         </>
                     ) : (
                         <>

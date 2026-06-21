@@ -10,6 +10,7 @@ import {
     subscribeToActiveNotices,
     addNotice,
     deleteNotice,
+    clearAllUserLogs,
 } from "../services/mealService";
 import MealCard from "../components/MealCard";
 import UserCard from "../components/UserCard";
@@ -38,6 +39,7 @@ export const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMealType, setModalMealType] = useState(null);
     const [isGlobalModalOpen, setIsGlobalModalOpen] = useState(false);
+    const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
 
     // Notice board state
     const [notices, setNotices] = useState([]);
@@ -132,6 +134,21 @@ export const Dashboard = () => {
 
     const handleOpenGlobalResetModal = () => {
         setIsGlobalModalOpen(true);
+    };
+
+    const handleOpenLogsResetModal = () => {
+        setIsLogsModalOpen(true);
+    };
+
+    const handleConfirmLogsReset = async () => {
+        setIsLogsModalOpen(false);
+        try {
+            await clearAllUserLogs(currentUser.uid);
+            triggerToast("All Activity Logs Cleared", "success");
+        } catch (err) {
+            console.error(err);
+            triggerToast("Failed to clear logs", "error");
+        }
     };
 
     const handleConfirmGlobalReset = async () => {
@@ -231,6 +248,16 @@ export const Dashboard = () => {
                     setIsGlobalModalOpen(false);
                 }}
                 onConfirm={handleConfirmGlobalReset}
+            />
+
+            {/* User Logs Reset Confirmation Dialog */}
+            <ConfirmModal
+                isOpen={isLogsModalOpen}
+                mealType="logs"
+                onClose={() => {
+                    setIsLogsModalOpen(false);
+                }}
+                onConfirm={handleConfirmLogsReset}
             />
 
             {/* Header Bar */}
@@ -347,7 +374,11 @@ export const Dashboard = () => {
                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                         Analytics Dashboard
                     </h2>
-                    <StatsCard roommates={roommates} logs={myLogs} />
+                    <StatsCard 
+                        roommates={roommates} 
+                        logs={myLogs} 
+                        onResetLogs={handleOpenLogsResetModal} 
+                    />
                 </section>
 
                 {/* Admin Controls Panel */}
